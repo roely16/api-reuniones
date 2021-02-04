@@ -9,6 +9,8 @@
         protected $table = "reunion";
         protected $primaryKey = "id";
 
+        protected $fillable = [];
+
     }
 
 ?>
