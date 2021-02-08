@@ -18,3 +18,8 @@ $router->get('/', function () use ($router) {
 $router->get('/prueba', 'UsuarioController@prueba');
 
 $router->post('/registrar_usuario', 'UsuarioController@registrar_usuario');
+$router->post('/login', 'UsuarioController@login');
+$router->post('/datos_usuario', 'UsuarioController@datos_usuario');
+
+$router->post('/generar_pdf', 'PDFController@generar');
+

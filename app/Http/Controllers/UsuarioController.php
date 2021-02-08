@@ -4,6 +4,7 @@
 
     use App\Persona;
     use App\Usuario;
+    use App\Menu;
 
     use Illuminate\Http\Request;
     use Illuminate\Support\Facades\Crypt;
@@ -67,13 +68,71 @@
 
         }
 
-        public function prueba(){
+        public function login(Request $request){
 
-            return response()->json("Test");
+            $usuario = Usuario::where('usuario', $request->usuario)->first();
+
+            if (!$usuario) {
+                
+                $data = [
+                    "status" => 100,
+                    "title" => "Error",
+                    "message" => "Usuario o contraseña incorrectos",
+                    "type" => "error"
+                ];
+
+                return response()->json($data);
+
+            }
+
+            // Si el usuario es correcto verificar la contraseña
+            $password = Crypt::decrypt($usuario->password);
+
+            if ($request->password != $password) {
+                
+                $data = [
+                    "status" => 100,
+                    "title" => "Error",
+                    "message" => "Usuario o contraseña incorrectos",
+                    "type" => "error"
+                ];
+
+                return response()->json($data);
+
+            }
+
+            $data_usuario = [
+                "id" => $usuario->id,
+                "id_persona" => $usuario->id_persona
+            ];
+
+            // Contraseña ingresada correcta
+            $data = [
+                "status" => 200,
+                "data" => $data_usuario
+            ];
+
+            return response()->json($data);
 
         }
 
-        //
+        public function datos_usuario(Request $request){
+
+            $persona = Persona::find($request->id_persona);
+
+            $menu = Menu::all();
+
+            $data = [
+                "persona" => $persona,
+                "menu" => $menu
+            ];
+
+            return response()->json($data);
+
+        }
+
+
+
     }
 
 ?>
