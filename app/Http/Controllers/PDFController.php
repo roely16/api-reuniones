@@ -8,33 +8,23 @@
 
     use App\Persona;
 
-    class PDFController extends Controller
-    {
-        /**
-         * Create a new controller instance.
-         *
-         * @return void
-         */
-        public function __construct()
-        {
-            //
-        }
+    class PDFController extends Controller{
+        
+        public function generar_vistaprevia(Request $request){
 
-        public function generar(Request $request){
+            //PDF::loadHTML($request->content)->setPaper('letter', 'portrait')->setWarnings(false)->save('pdf/temp.pdf');
 
-            $personas = Persona::all();
+            $pdf = PDF::loadView('pdf', $request);
+            $pdf->save('pdf/temp.pdf');
 
             $data = [
-                "personas" => $personas
+                "pdf_url" => "pdf/temp.pdf"
             ];
 
-            $pdf = PDF::loadView('pdf', $data);
-
-            return $pdf->stream('prueba.pdf');
+            return response()->json($data);
 
         }
 
-        //
     }
 
 ?>

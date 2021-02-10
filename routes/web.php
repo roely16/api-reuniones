@@ -21,5 +21,8 @@ $router->post('/registrar_usuario', 'UsuarioController@registrar_usuario');
 $router->post('/login', 'UsuarioController@login');
 $router->post('/datos_usuario', 'UsuarioController@datos_usuario');
 
-$router->post('/generar_pdf', 'PDFController@generar');
+// Obtener las personas para compartir 
+$router->post('/personas_compartir', 'PersonaController@personas_compartir');
+
+$router->post('/generar_vistaprevia', 'PDFController@generar_vistaprevia');
 
