@@ -26,3 +26,9 @@ $router->post('/personas_compartir', 'PersonaController@personas_compartir');
 
 $router->post('/generar_vistaprevia', 'PDFController@generar_vistaprevia');
 
+// Registrar un participante
+$router->post('/registrar_participante', 'ParticipanteController@registrar_participante');
+$router->post('/obtener_participantes', 'ParticipanteController@obtener_participantes');
+$router->post('/detalle_participante', 'ParticipanteController@detalle_participante');
+$router->post('/editar_participante', 'ParticipanteController@editar_participante');
+$router->post('/eliminar_participante', 'ParticipanteController@eliminar_participante');
