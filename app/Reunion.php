@@ -9,6 +9,12 @@
         protected $table = "reunion";
         protected $primaryKey = "id";
 
+        public function encargado_registro(){
+
+            return $this->belongsTo('App\Persona', 'registrado_por');
+
+        }
+
     }
 
 ?>

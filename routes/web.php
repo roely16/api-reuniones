@@ -39,3 +39,10 @@ $router->get('/test_pdf', 'PDFController@test');
 
 $router->post('/registrar_reunion', 'ReunionController@registrar_reunion');
 $router->post('/obtener_reuniones', 'ReunionController@obtener_reuniones');
+$router->post('/detalle_reunion', 'ReunionController@obtener_detalle');
+$router->post('/eliminar_reunion', 'ReunionController@eliminar_reunion');
+$router->post('/editar_reunion', 'ReunionController@editar_reunion');
+
+//Compartir la bitácora de la reunión
+$router->post('/compartir_bitacora', 'CompartirController@compartir_bitacora');
+$router->post('/historial_envios', 'CompartirController@historial_envios');
