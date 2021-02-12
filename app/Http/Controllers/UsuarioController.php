@@ -5,6 +5,7 @@
     use App\Persona;
     use App\Usuario;
     use App\Menu;
+    use App\Rol;
 
     use Illuminate\Http\Request;
     use Illuminate\Support\Facades\Crypt;
@@ -131,7 +132,13 @@
 
         }
 
+        public function obtener_roles(){
 
+            $roles = Rol::all();
+
+            return response()->json($roles);
+
+        }
 
     }
 

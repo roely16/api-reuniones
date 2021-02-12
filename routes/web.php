@@ -32,3 +32,10 @@ $router->post('/obtener_participantes', 'ParticipanteController@obtener_particip
 $router->post('/detalle_participante', 'ParticipanteController@detalle_participante');
 $router->post('/editar_participante', 'ParticipanteController@editar_participante');
 $router->post('/eliminar_participante', 'ParticipanteController@eliminar_participante');
+
+$router->post('/obtener_roles', 'UsuarioController@obtener_roles');
+
+$router->get('/test_pdf', 'PDFController@test');
+
+$router->post('/registrar_reunion', 'ReunionController@registrar_reunion');
+$router->post('/obtener_reuniones', 'ReunionController@obtener_reuniones');

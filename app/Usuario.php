@@ -9,7 +9,7 @@
         protected $table = "usuario";
         protected $primaryKey = "id";
 
-        protected $fillable = ['usuario', 'password', 'id_persona'];
+        protected $fillable = ['usuario', 'password', 'id_persona', 'id_rol'];
 
     }
 

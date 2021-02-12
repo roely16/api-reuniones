@@ -47,7 +47,8 @@
                     $result = $usuario->fill([
                         'usuario' => $request->telefono,
                         'password' => Crypt::encrypt($request->password),
-                        'id_persona' => $persona->id
+                        'id_persona' => $persona->id,
+                        'id_rol' => $request->id_rol
                     ])->save();
 
                 } catch (\Illuminate\Database\QueryException $ex) {
@@ -94,6 +95,11 @@
                     "width" => "5%"
                 ],
                 [
+                    "text" => "",
+                    "value" => "avatar",
+                    "width" => "5%"
+                ],
+                [
                     "text" => "Nombre",
                     "value" => "nombre",
                     "width" => "25%"
@@ -135,8 +141,15 @@
 
             $usuario = Usuario::where('id_persona', $persona->id)->first();
 
-            $persona->usuario = $usuario;
+            if ($usuario) {
+                
+                $persona->usuario = $usuario;
 
+                $persona->id_rol = $usuario->id_rol;
+
+
+            }
+            
             return response()->json($persona);
 
         }
@@ -181,7 +194,8 @@
                     $result = $usuario->fill([
                         'usuario' => $request->telefono,
                         'password' => Crypt::encrypt($request->password),
-                        'id_persona' => $persona->id
+                        'id_persona' => $persona->id,
+                        'id_rol' => $request->id_rol
                     ])->save();
 
                 } catch (\Illuminate\Database\QueryException $ex) {
@@ -196,6 +210,15 @@
                     return response()->json($data);
 
                 }
+
+            }
+
+            if ($request->usuario) {
+                
+                $usuario = Usuario::find($request->usuario["id"]);
+
+                $usuario->id_rol = $request->id_rol;
+                $usuario->save();
 
             }
 
