@@ -85,10 +85,16 @@
 
         public function historial_envios(Request $request){
 
-            $envios = ReunionEnvio::where('id_reunion', $request->id)->get();
+            // $envios = ReunionEnvio::where('id_reunion', $request->id)->get();
+
+            $envios = app('db')->select("   SELECT *, DATE_FORMAT(created_at, '%d/%m/%Y %H:%m:%i') as created_at
+                                            FROM reunion_envio
+                                            WHERE id_reunion = $request->id");
 
             foreach ($envios as &$envio) {
                 
+                $envio->active = false;
+
                 $persona = Persona::find($envio->enviado_por);
 
                 $envio->persona_envia = $persona->nombres . ' ' . $persona->apellidos;
@@ -102,12 +108,15 @@
                     $persona = Persona::find($item->id_persona);
 
                     $item->persona_envio = $persona->nombres . ' ' . $persona->apellidos;
+                    $item->cargo = $persona->cargo;
 
                 }
 
+                $envio->detalle_envio = $detalle_envio;
+
             }
 
-            return response()->json($request);
+            return response()->json($envios);
 
         }
 
