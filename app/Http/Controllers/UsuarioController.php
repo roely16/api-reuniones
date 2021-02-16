@@ -102,6 +102,31 @@
 
             }
 
+            // Si el usuario no es administrador
+            if ($usuario->id_rol != 1) {
+                
+                $hoy = date('Y-m-d');
+
+                $evento = app('db')->select("   SELECT *
+                                                FROM calendario
+                                                WHERE fecha = '$hoy'
+                                                AND id_persona = $usuario->id_persona");
+
+                if (!$evento) {
+                    
+                    $data = [
+                        "status" => 100,
+                        "title" => "Error",
+                        "message" => "No tiene programado el acceso para el día de hoy",
+                        "type" => "error"
+                    ];
+    
+                    return response()->json($data);
+
+                }
+
+            }
+
             $data_usuario = [
                 "id" => $usuario->id,
                 "id_persona" => $usuario->id_persona
@@ -121,8 +146,14 @@
 
             $persona = Persona::find($request->id_persona);
 
-            $menu = Menu::all();
+            $usuario = Usuario::where('id_persona', $request->id_persona)->first();
 
+
+            $menu = app('db')->select(  "SELECT t2.*
+                                        FROM menu_rol t1
+                                        INNER JOIN menu t2
+                                        ON t1.id_menu = t2.id
+                                        WHERE t1.id_rol = $usuario->id_rol");
             $data = [
                 "persona" => $persona,
                 "menu" => $menu

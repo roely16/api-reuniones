@@ -70,7 +70,8 @@
                 "status" => 200,
                 "title" => "Excelente!",
                 "message" => "El participante a sido registrado exitosamente",
-                "type" => "success"
+                "type" => "success",
+                "data" => $persona
             ];
 
             return response()->json($data);
@@ -250,6 +251,58 @@
             }
 
             return response()->json($data);
+
+        }
+
+        public function subir_avatar(Request $request){
+
+            if ($request->hasFile('files')) {
+                
+                $files = $request->file('files');
+                $id = $request->id;
+
+                $uploads_dir = base_path('public/avatar');
+                $file_name = uniqid();
+
+                $path = $request->file('files')->move($uploads_dir, $file_name . '.' . $files->getClientOriginalExtension());
+
+                $persona = Persona::find($id);
+                $persona->avatar = 'avatar/' . $file_name . '.' . $files->getClientOriginalExtension();
+                $persona->save();
+
+                return response()->json($persona);
+
+            }
+
+
+        }
+
+        public function editar_avatar(Request $request){
+
+            if ($request->hasFile('files')) {
+                
+                // Verificar si ya tenia un avatar
+                $persona = Persona::find($request->id);
+
+                if ($persona->avatar) {
+                    
+                    unlink(base_path() . '/public/' . $persona->avatar);
+
+                }
+                $files = $request->file('files');
+                $id = $request->id;
+
+                $uploads_dir = base_path('public/avatar');
+                $file_name = uniqid();
+
+                $path = $request->file('files')->move($uploads_dir, $file_name . '.' . $files->getClientOriginalExtension());
+
+                $persona->avatar = 'avatar/' . $file_name . '.' . $files->getClientOriginalExtension();
+                $persona->save();
+
+                return response()->json($persona);
+
+            }
 
         }
 

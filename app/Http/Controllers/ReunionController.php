@@ -5,6 +5,7 @@
     use Illuminate\Http\Request;
 
     use App\Reunion;
+    use App\Usuario;
 
     class ReunionController extends Controller{
 
@@ -54,7 +55,11 @@
 
         public function obtener_reuniones(Request $request){
 
-            $reuniones = app('db')->select("    SELECT 
+            $usuario = Usuario::find($request->id_usuario);
+
+            if ($usuario->id_rol == 1) {
+                
+                $reuniones = app('db')->select("    SELECT 
                                                     t1.*, 
                                                     t2.nombres, 
                                                     t2.apellidos, 
@@ -65,6 +70,25 @@
                                                 ON t1.registrado_por = t2.id
                                                 WHERE t1.deleted_at IS NULL
                                                 ORDER BY t1.id DESC");
+
+            }else{
+
+                $reuniones = app('db')->select("    SELECT 
+                                                    t1.*, 
+                                                    t2.nombres, 
+                                                    t2.apellidos, 
+                                                    t2.avatar, 
+                                                    DATE_FORMAT(t1.created_at, '%d/%m/%Y %H:%m:%i') as created_at
+                                                FROM reunion t1
+                                                INNER JOIN persona t2
+                                                ON t1.registrado_por = t2.id
+                                                WHERE t1.deleted_at IS NULL
+                                                AND t1.registrado_por = $usuario->id_persona
+                                                ORDER BY t1.id DESC");
+
+            }
+
+            
 
             $headers = [
                 [
@@ -178,4 +202,5 @@
             return response()->json($data);
 
         }
+        
     }

@@ -46,3 +46,16 @@ $router->post('/editar_reunion', 'ReunionController@editar_reunion');
 //Compartir la bitácora de la reunión
 $router->post('/compartir_bitacora', 'CompartirController@compartir_bitacora');
 $router->post('/historial_envios', 'CompartirController@historial_envios');
+
+// Registrar en el calendario
+$router->post('/registrar_calendario', 'CalendarioController@registrar_calendario');
+$router->post('/obtener_calendario', 'CalendarioController@obtener_calendario');
+$router->post('/editar_calendario', 'CalendarioController@editar_calendario');
+$router->post('/eliminar_evento', 'CalendarioController@eliminar_evento');
+
+$router->get('/test_mail', 'CompartirController@test_mail');
+
+// Subir avatar
+$router->post('/subir_avatar', 'ParticipanteController@subir_avatar');
+$router->post('/editar_avatar', 'ParticipanteController@editar_avatar');
+

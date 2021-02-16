@@ -11,6 +11,13 @@
     use App\ReunionEnvioDetalle;
     use App\Persona;
 
+    // require base_path() . '/vendor/phpmailer/phpmailer/src/PHPMailer.php';
+    // require base_path() . '/vendor/phpmailer/phpmailer/src/Exception.php';
+    // require base_path() . '/vendor/phpmailer/phpmailer/src/SMTP.php';
+
+    require base_path() . '/vendor/PHPMailer_old/PHPMailerAutoload.php';
+
+
     class CompartirController extends Controller{
 
         public function compartir_bitacora(Request $request){
@@ -54,7 +61,7 @@
             $reunion_envio->documento = $nombre_archivo;
             $reunion_envio->enviado_por = $request->enviado_por;
 
-            $reunion_envio->save();
+            //$reunion_envio->save();
 
             // Registrar el envio a cada uno de los integrantes
             foreach ($request->compartir as $contacto) {
@@ -108,6 +115,7 @@
                     $persona = Persona::find($item->id_persona);
 
                     $item->persona_envio = $persona->nombres . ' ' . $persona->apellidos;
+                    $item->avatar = $persona->avatar;
                     $item->cargo = $persona->cargo;
 
                 }
@@ -118,6 +126,26 @@
 
             return response()->json($envios);
 
+        }
+
+        public function test_mail(){
+
+            $mail = new \PHPMailer(true);
+
+            $mail->SMTPDebug  = 1; 
+            $mail->Host = 'mail2.muniguate.com';  
+            $mail->isSMTP();  
+            $mail->charset = 'UTF-8';                // Set the SMTP server to send through
+            $mail->Username   = 'soportecatastro';                     // SMTP username
+            $mail->Password   = 'catastro2015';
+
+            $mail->setFrom('gerson.roely@gmail.com');
+            $mail->addAddress('hchur@muniguate.com'); 
+            $mail->Subject = 'Here is the subject';
+            $mail->Body    = 'This is the HTML message body <b>in bold!</b>';
+            $mail->isHTML(true);  
+
+            $mail->send();
         }
 
     }
