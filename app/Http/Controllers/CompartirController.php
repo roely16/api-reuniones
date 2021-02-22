@@ -40,7 +40,14 @@
             $fecha = "Guatemala " . date('d') . ' de ' . $meses[date('n') - 1] . ' del ' . date('Y');
 
             // Buscar la reunión
-            $reunion = Reunion::find($request->id);
+            //$reunion = Reunion::find($request->id);
+
+            $reunion = app('db')->select("  SELECT *, DATE_FORMAT(created_at, '%d/%m/%Y') as created_at
+                                            FROM reunion
+                                            WHERE id = $request->id
+                                            AND deleted_at IS NULL");
+
+            $reunion = $reunion[0];
 
             $data_pdf = [
                 "content" => $reunion->contenido,
@@ -61,7 +68,7 @@
             $reunion_envio->documento = $nombre_archivo;
             $reunion_envio->enviado_por = $request->enviado_por;
 
-            //$reunion_envio->save();
+            $reunion_envio->save();
 
             // Registrar el envio a cada uno de los integrantes
             foreach ($request->compartir as $contacto) {
@@ -72,21 +79,51 @@
                     
                     // Enviar la bitácora a cada uno de los correos
 
+                    $mail = new \PHPMailer(true);
 
-                    
-                    $envio_detalle = new ReunionEnvioDetalle();
+                    $mail->SMTPDebug  = 0; 
+                    $mail->Host = 'mail2.muniguate.com';  
+                    $mail->isSMTP();  
+                    $mail->Username   = 'soportecatastro';                  
+                    $mail->Password   = 'catastro2015';
+                    $mail->CharSet = 'UTF-8';
 
-                    $envio_detalle->id_envio = $reunion_envio->id;
-                    $envio_detalle->id_persona = $persona->id;
-                    $envio_detalle->email = $persona->email;
 
-                    $envio_detalle->save();
+                    $mail->setFrom('noreply@muniguate.com');
+                    $mail->addAddress($persona->email); 
+                    $mail->Subject = 'Bitácora de Reunión ' . $reunion->created_at;
+                    $mail->Body    = '<p>Se adjunta bitácora de reunión con fecha: ' . $reunion->created_at . '</p>';
+                    $mail->addAttachment('pdf/' . $nombre_archivo, 'Bitácora ' . $reunion->created_at);
+                    $mail->isHTML(true);  
+
+                    try {
+                        
+                        $result_send = $mail->send();
+
+                        $envio_detalle = new ReunionEnvioDetalle();
+
+                        $envio_detalle->id_envio = $reunion_envio->id;
+                        $envio_detalle->id_persona = $persona->id;
+                        $envio_detalle->email = $persona->email;
+
+                        $envio_detalle->save();
+                        
+                    } catch (\Throwable $th) {
+                        //throw $th;
+                    }
 
                 }
 
             }
 
-            return response()->json($request);
+            $data = [
+                "status" => 200,
+                "title" => "Excelente!",
+                "message" => "La reunión a sido compartida exitosamente",
+                "type" => "success"
+            ];
+
+            return response()->json($data);
 
         }
 
@@ -135,14 +172,14 @@
             $mail->SMTPDebug  = 1; 
             $mail->Host = 'mail2.muniguate.com';  
             $mail->isSMTP();  
-            $mail->charset = 'UTF-8';                // Set the SMTP server to send through
-            $mail->Username   = 'soportecatastro';                     // SMTP username
+            $mail->charset = 'UTF-8';                
+            $mail->Username   = 'soportecatastro';                  
             $mail->Password   = 'catastro2015';
 
-            $mail->setFrom('gerson.roely@gmail.com');
+            $mail->setFrom('noreply@muniguate.com');
             $mail->addAddress('hchur@muniguate.com'); 
-            $mail->Subject = 'Here is the subject';
-            $mail->Body    = 'This is the HTML message body <b>in bold!</b>';
+            $mail->Subject = 'Bitácora de Reunión';
+            $mail->Body    = 'Se les comparte la bitácora de la reunión.';
             $mail->isHTML(true);  
 
             $mail->send();
