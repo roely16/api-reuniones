@@ -6,6 +6,7 @@
 
     use App\Calendario;
     use App\Persona;
+    use App\Usuario;
 
     class CalendarioController extends Controller{
         
@@ -115,6 +116,34 @@
             ];
 
             return response()->json($data);
+
+        }
+
+        public function verificar_permiso(Request $request){
+
+            $usuario = Usuario::find($request->id_usuario);
+
+            $hoy = date('Y-m-d');
+
+            $evento = app('db')->select("   SELECT *
+                                            FROM calendario
+                                            WHERE fecha = '$hoy'
+                                            AND id_persona = $usuario->id_persona");
+
+            if (!$evento) {
+                
+                $data = [
+                    "status" => 100,
+                    "title" => "Error",
+                    "message" => "No tiene programado el acceso para el día de hoy",
+                    "type" => "error"
+                ];
+
+                return response()->json($data);
+
+            }
+
+            return response()->json();
 
         }
 

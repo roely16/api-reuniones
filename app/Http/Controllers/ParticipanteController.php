@@ -6,6 +6,8 @@
 
     use App\Persona;
     use App\Usuario;
+    use App\Rol;
+    use App\Grupo;
 
     use Illuminate\Support\Facades\Crypt;
     
@@ -35,8 +37,29 @@
             $persona->telefono = $request->telefono;
             $persona->email = $request->email;
             $persona->cargo = $request->cargo;
+
+            $persona->grupo = $request->grupo ? 'S' :  null;
             
             $result = $persona->save();
+
+            // Buscar el rol de la persona que esta registrando
+            $usuario = Usuario::find($request->registrado_por);
+
+            $rol = Rol::find($usuario->id_rol);
+
+            if ($rol->subadmin) {
+                
+                // Si es un subadministrador podrá agregar a las personas y quedarán en su grupo
+                $grupo = app('db')->select("    SELECT id_grupo
+                                                FROM grupo_participante
+                                                WHERE id_persona = $usuario->id_persona");
+
+                $result = app('db')->table('grupo_participante')->insert([
+                    'id_grupo' => $grupo[0]->id_grupo,
+                    'id_persona' => $persona->id
+                ]);
+
+            }
 
             if ($request->habilitar_usuario) {
                 
@@ -64,6 +87,22 @@
 
                 }
 
+                // Si esta marcada la opción de grupo personalizado
+                if ($request->grupo) {
+                    
+                    $grupo = new Grupo();
+
+                    $grupo->id_persona = $persona->id;
+                    $result = $grupo->save();
+
+                    // Ingresar como participante del grupo
+                    $result = app('db')->table('grupo_participante')->insert([
+                        'id_grupo' => $grupo->id,
+                        'id_persona' => $persona->id
+                    ]);
+
+                }
+
             }
 
             $data = [
@@ -80,10 +119,49 @@
 
         public function obtener_participantes(Request $request){
 
-            $participantes = Persona::all();
+            $usuario = Usuario::find($request->id_usuario);
+
+            $rol = Rol::find($usuario->id_rol);
+
+            if ($rol->admin) {
+                
+                $participantes = Persona::all();
+
+            }else{
+
+                $participantes = app('db')->select("    SELECT t2.*
+                                                        FROM grupo_participante t1
+                                                        INNER JOIN persona t2
+                                                        ON t1.id_persona = t2.id
+                                                        WHERE t1.id_grupo IN (
+                                                            SELECT id_grupo
+                                                            FROM grupo_participante
+                                                            WHERE id_persona = $usuario->id_persona
+                                                        )"
+                                                );
+
+            }
 
             foreach ($participantes as &$participante) {
                 
+                $usuario = Usuario::where('id_persona', $participante->id)->first();
+
+                if ($usuario) {
+                
+                    $rol = Rol::find($usuario->id_rol);
+
+                    if ($rol) {
+                        
+                        $participante->rol = $rol;
+
+                    }
+
+                }else{
+
+                    $participante->rol = null;
+
+                }
+
                 $participante->nombre = $participante->nombres . ' ' . $participante->apellidos;
 
             }
@@ -103,7 +181,7 @@
                 [
                     "text" => "Nombre",
                     "value" => "nombre",
-                    "width" => "25%"
+                    "width" => "20%"
                 ], 
                 [
                     "text" => "Teléfono",
@@ -119,6 +197,11 @@
                     "text" => "Cargo",
                     "value" => "cargo",
                     "width" => "30%%"
+                ],
+                [
+                    "text" => "Rol",
+                    "value" => "rol",
+                    "width" => "10%%"
                 ],
                 [
                     "text" => "Acción",
@@ -209,6 +292,32 @@
                     ];
 
                     return response()->json($data);
+
+                }
+                
+            }
+
+            // Si esta marcada la opción de grupo personalizado
+            if ($request->grupo) {
+                
+                $grupo_existente = Grupo::where('id_persona', $persona->id)->first();
+
+                if (!$grupo_existente) {
+                    
+                    $grupo = new Grupo();
+
+                    $grupo->id_persona = $persona->id;
+                    $result = $grupo->save();
+
+                    // Ingresar como participante del grupo
+                    $result = app('db')->table('grupo_participante')->insert([
+                        'id_grupo' => $grupo->id,
+                        'id_persona' => $persona->id
+                    ]);
+                    
+                    $persona = Persona::find($request->id);
+                    $persona->grupo = 'S';
+                    $persona->save();
 
                 }
 

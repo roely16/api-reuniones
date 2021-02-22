@@ -11,10 +11,6 @@
     use App\ReunionEnvioDetalle;
     use App\Persona;
 
-    // require base_path() . '/vendor/phpmailer/phpmailer/src/PHPMailer.php';
-    // require base_path() . '/vendor/phpmailer/phpmailer/src/Exception.php';
-    // require base_path() . '/vendor/phpmailer/phpmailer/src/SMTP.php';
-
     require base_path() . '/vendor/PHPMailer_old/PHPMailerAutoload.php';
 
 
@@ -163,26 +159,6 @@
 
             return response()->json($envios);
 
-        }
-
-        public function test_mail(){
-
-            $mail = new \PHPMailer(true);
-
-            $mail->SMTPDebug  = 1; 
-            $mail->Host = 'mail2.muniguate.com';  
-            $mail->isSMTP();  
-            $mail->charset = 'UTF-8';                
-            $mail->Username   = 'soportecatastro';                  
-            $mail->Password   = 'catastro2015';
-
-            $mail->setFrom('noreply@muniguate.com');
-            $mail->addAddress('hchur@muniguate.com'); 
-            $mail->Subject = 'Bitácora de Reunión';
-            $mail->Body    = 'Se les comparte la bitácora de la reunión.';
-            $mail->isHTML(true);  
-
-            $mail->send();
         }
 
     }

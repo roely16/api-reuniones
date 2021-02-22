@@ -32,6 +32,7 @@ $router->post('/obtener_participantes', 'ParticipanteController@obtener_particip
 $router->post('/detalle_participante', 'ParticipanteController@detalle_participante');
 $router->post('/editar_participante', 'ParticipanteController@editar_participante');
 $router->post('/eliminar_participante', 'ParticipanteController@eliminar_participante');
+$router->post('/actualizar_pass', 'UsuarioController@actualizar_pass');
 
 $router->post('/obtener_roles', 'UsuarioController@obtener_roles');
 

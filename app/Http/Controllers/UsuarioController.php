@@ -102,28 +102,37 @@
 
             }
 
+            // Buscar el rol del usuario
+            $rol = Rol::find($usuario->id_rol);
+
             // Si el usuario no es administrador
-            if ($usuario->id_rol != 1) {
+            // if ($usuario->id_rol != 1) {
                 
-                $hoy = date('Y-m-d');
+            //     $hoy = date('Y-m-d');
 
-                $evento = app('db')->select("   SELECT *
-                                                FROM calendario
-                                                WHERE fecha = '$hoy'
-                                                AND id_persona = $usuario->id_persona");
+            //     $evento = app('db')->select("   SELECT *
+            //                                     FROM calendario
+            //                                     WHERE fecha = '$hoy'
+            //                                     AND id_persona = $usuario->id_persona");
 
-                if (!$evento) {
+            //     if (!$evento) {
                     
-                    $data = [
-                        "status" => 100,
-                        "title" => "Error",
-                        "message" => "No tiene programado el acceso para el día de hoy",
-                        "type" => "error"
-                    ];
+            //         $data = [
+            //             "status" => 100,
+            //             "title" => "Error",
+            //             "message" => "No tiene programado el acceso para el día de hoy",
+            //             "type" => "error"
+            //         ];
     
-                    return response()->json($data);
+            //         return response()->json($data);
 
-                }
+            //     }
+
+            // }
+
+            if (!$rol->acceso_no_programado) {
+                
+                // Validar que acceda en la fecha que corresponde
 
             }
 
@@ -154,20 +163,72 @@
                                         INNER JOIN menu t2
                                         ON t1.id_menu = t2.id
                                         WHERE t1.id_rol = $usuario->id_rol");
+
+            $rol = Rol::find($usuario->id_rol);
+
             $data = [
                 "persona" => $persona,
-                "menu" => $menu
+                "menu" => $menu,
+                "rol" => $rol
             ];
 
             return response()->json($data);
 
         }
 
-        public function obtener_roles(){
+        public function obtener_roles(Request $request){
 
-            $roles = Rol::all();
+            $usuario = Usuario::find($request->id_usuario);
+
+            $roles = app('db')->select("    SELECT *
+                                            FROM rol
+                                            WHERE id IN (
+                                                SELECT id_rol_acceso
+                                                FROM rol_permiso
+                                                WHERE id_rol = $usuario->id_rol
+                                            )");
 
             return response()->json($roles);
+
+        }
+
+        public function actualizar_pass(Request $request){
+
+            $usuario = Usuario::find($request->id_usuario);
+
+            $password = Crypt::decrypt($usuario->password);
+
+            if ($request->actual_pass != $password) {
+                
+                $data = [
+                    "status" => 100,
+                    "title" => "Error",
+                    "message" => "Actual contraseña incorrecta",
+                    "type" => "error"
+                ];
+
+                return response()->json($data);
+
+            }
+
+            // Actualizar la contraseña
+            $nuevo_pass = Crypt::encrypt($request->nuevo_pass);
+
+            $usuario->password = $nuevo_pass;
+            $result = $usuario->save();
+
+            if ($result) {
+                
+                $data = [
+                    "status" => 200,
+                    "title" => "Excelente!",
+                    "message" => "La contraseña a sido actualizada exitosamente",
+                    "type" => "success"
+                ];
+
+            }
+
+            return response()->json($data);
 
         }
 
