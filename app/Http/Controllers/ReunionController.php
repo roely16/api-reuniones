@@ -6,6 +6,7 @@
 
     use App\Reunion;
     use App\Usuario;
+    use App\Rol;
 
     class ReunionController extends Controller{
 
@@ -57,9 +58,13 @@
 
             $usuario = Usuario::find($request->id_usuario);
 
-            if ($usuario->id_rol == 1) {
+            $rol = Rol::find($usuario->id_rol);
+
+            if ($rol->admin) {
                 
-                $reuniones = app('db')->select("    SELECT 
+                // Si el rol es admin puede acceder a las reuniones de admin y asesores
+
+                $reuniones = app('db')->select("SELECT 
                                                     t1.*, 
                                                     t2.nombres, 
                                                     t2.apellidos, 
@@ -69,11 +74,47 @@
                                                 INNER JOIN persona t2
                                                 ON t1.registrado_por = t2.id
                                                 WHERE t1.deleted_at IS NULL
+                                                AND t1.registrado_por IN (
+                                                    SELECT t1.id
+                                                    FROM persona t1
+                                                    INNER JOIN usuario t2
+                                                    ON t1.id = t2.id_persona
+                                                    WHERE t2.id_rol IN (1,2)
+                                                )
+                                                ORDER BY t1.id DESC");
+
+            }elseif($rol->subadmin){
+
+                // Si el rol es subadmin puede acceder a las bitácoras de todo el grupo
+
+                // Buscar el id del grupo
+                $grupo = app('db')->select("    SELECT id_grupo
+                                                FROM grupo_participante
+                                                WHERE id_persona = $usuario->id_persona");
+
+                $id_grupo = $grupo[0]->id_grupo;
+
+                $reuniones = app('db')->select("SELECT 
+                                                    t1.*, 
+                                                    t2.nombres, 
+                                                    t2.apellidos, 
+                                                    t2.avatar, 
+                                                    DATE_FORMAT(t1.created_at, '%d/%m/%Y %H:%m:%i') as created_at
+                                                FROM reunion t1
+                                                INNER JOIN persona t2
+                                                ON t1.registrado_por = t2.id
+                                                WHERE t1.deleted_at IS NULL
+                                                AND t1.registrado_por IN (
+                                                    SELECT id_persona
+                                                    FROM grupo_participante
+                                                    WHERE id_grupo = $id_grupo
+                                                )
                                                 ORDER BY t1.id DESC");
 
             }else{
 
-                $reuniones = app('db')->select("    SELECT 
+                // Solo tiene acceso a sus bitácoras
+                $reuniones = app('db')->select("SELECT 
                                                     t1.*, 
                                                     t2.nombres, 
                                                     t2.apellidos, 

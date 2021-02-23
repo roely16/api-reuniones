@@ -60,3 +60,8 @@ $router->get('/test_mail', 'CompartirController@test_mail');
 $router->post('/subir_avatar', 'ParticipanteController@subir_avatar');
 $router->post('/editar_avatar', 'ParticipanteController@editar_avatar');
 
+// Verificar si tiene calendarizado el acceso
+$router->post('/verificar_participacion', 'CalendarioController@verificar_participacion');
+
+// Personas para agregar en el calendario, dependiendo del rol
+$router->post('/personas_calendario', 'CalendarioController@personas_calendario');

@@ -125,7 +125,33 @@
 
             if ($rol->admin) {
                 
-                $participantes = Persona::all();
+                //$participantes = Persona::all();
+                $participantes = app('db')->select("    SELECT t1.*
+                                                        FROM persona t1
+                                                        INNER JOIN usuario t2
+                                                        ON t1.id = t2.id_persona
+                                                        AND t2.id_rol IN (
+                                                            SELECT id_rol_acceso
+                                                            FROM rol_permiso
+                                                            WHERE id_rol = $usuario->id_rol
+                                                        )
+                                                        AND t1.deleted_at IS NULL");
+
+                $participantes_s_rol = app('db')->select("  SELECT t1.*
+                                                            FROM persona t1
+                                                            WHERE id NOT IN (
+                                                                SELECT id_persona
+                                                                FROM usuario
+                                                            )
+                                                            AND t1.deleted_at IS NULL");
+
+                foreach ($participantes_s_rol as $participante) {
+                    
+                    array_push($participantes, $participante);
+
+                }
+
+                
 
             }else{
 
@@ -137,13 +163,26 @@
                                                             SELECT id_grupo
                                                             FROM grupo_participante
                                                             WHERE id_persona = $usuario->id_persona
-                                                        )"
+                                                        )
+                                                        AND t2.deleted_at IS NULL"
                                                 );
 
             }
 
+            $id_persona = $usuario->id_persona;
+
             foreach ($participantes as &$participante) {
                 
+                // No permitir eliminar el registro del usuario logeado
+                if ($participante->id == $id_persona) {
+
+                    $participante->deletable = false;
+
+                }else{
+
+                    $participante->deletable = true;
+                }
+
                 $usuario = Usuario::where('id_persona', $participante->id)->first();
 
                 if ($usuario) {
@@ -346,7 +385,21 @@
         public function eliminar_participante(Request $request){
 
             $persona = Persona::find($request->id);
+            
             $result = $persona->delete();
+
+            try {
+                
+                 // Eliminar el usuario de la persona
+                app('db')->table('usuario')->where('id_persona', $request->id)->delete();
+
+                // Eliminar su participación en el calendario
+                app('db')->table('calendario')->where('id_persona', $request->id)->delete();
+
+            } catch (\Throwable $th) {
+                //throw $th;
+            }
+           
 
             if ($result) {
                 
