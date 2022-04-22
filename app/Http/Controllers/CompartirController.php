@@ -35,9 +35,6 @@
 
             $fecha = "Guatemala " . date('d') . ' de ' . $meses[date('n') - 1] . ' del ' . date('Y');
 
-            // Buscar la reunión
-            //$reunion = Reunion::find($request->id);
-
             $reunion = app('db')->select("  SELECT *, DATE_FORMAT(created_at, '%d/%m/%Y') as created_at
                                             FROM reunion
                                             WHERE id = $request->id
@@ -45,9 +42,14 @@
 
             $reunion = $reunion[0];
 
+            $reunion = Reunion::find($request->id);
+
+            $persona = Persona::find($reunion->registrado_por);
+
             $data_pdf = [
                 "content" => $reunion->contenido,
-                "fecha" => $fecha
+                "fecha" => $fecha,
+                "persona" => $persona
             ];
 
             PDF::setOptions(['defaultFont' => 'arial', 'isRemoteEnabled' => true, 'debugKeepTemp' => true, 'tempDir' => '/public/pdf/']);

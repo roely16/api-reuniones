@@ -7,6 +7,8 @@
     use Barryvdh\DomPDF\Facade as PDF;
 
     use App\Persona;
+    use App\Usuario;
+    use App\Reunion;
 
     class PDFController extends Controller{
         
@@ -29,9 +31,27 @@
 
             $fecha = "Guatemala " . date('d') . ' de ' . $meses[date('n') - 1] . ' del ' . date('Y');
 
+            // Check if document is already saved
+            
+            if ($request->id) {
+                
+                $reunion = Reunion::find($request->id);
+
+                $persona = Persona::find($reunion->registrado_por);
+
+            }else{
+
+                $usuario = Usuario::find($request->usuario);
+
+                $persona = Persona::find($usuario->id_persona);
+
+            }
+            
+
             $data_pdf = [
                 "content" => $request->content,
-                "fecha" => $fecha
+                "fecha" => $fecha,
+                "persona" => $persona
             ];
 
             PDF::setOptions(['defaultFont' => 'arial', 'isRemoteEnabled' => true, 'debugKeepTemp' => true, 'tempDir' => '/public/pdf/']);

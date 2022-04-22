@@ -14,7 +14,7 @@
       left: 0px; 
       right: 0px; 
       height: 30px;
-	  margin-top: -50px; 
+	    margin-top: -50px; 
       background-image: url("{{ url('/img/top.png') }}");; 
       text-align: center; 
     }
@@ -455,6 +455,10 @@
       text-align: end;
     }
 
+    .text_footer{
+      margin-left: 20px;
+    }
+
   </style>
   
 
@@ -463,6 +467,13 @@
   <div id="header">
   </div>
   <div id="footer">
+    <div class="row">
+    <div class="column">
+    <span class="text_footer">
+      Elaborado por: {{ $persona->nombres }} {{ $persona->apellidos }}
+    </span>
+    </div>
+    </div>
   </div>
   <div id="content">
 
