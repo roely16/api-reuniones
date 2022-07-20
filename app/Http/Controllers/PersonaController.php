@@ -24,7 +24,8 @@
                                                 FROM persona t1
                                                 INNER JOIN usuario t2
                                                 ON t1.id = t2.id_persona
-                                                WHERE t2.id_rol = 1");
+                                                WHERE t2.id_rol = 1
+                                                AND t1.deleted_at IS NULL");
 
                 foreach ($personas as &$persona) {
                                 
@@ -57,7 +58,8 @@
                                                 FROM persona t1
                                                 INNER JOIN usuario t2
                                                 ON t1.id = t2.id_persona
-                                                WHERE t2.id_rol = 2");
+                                                WHERE t2.id_rol = 2
+                                                AND t1.deleted_at IS NULL");
 
                 foreach ($items as &$item) {
 
@@ -90,7 +92,8 @@
                                                 FROM persona t1
                                                 INNER JOIN usuario t2
                                                 ON t1.id = t2.id_persona
-                                                WHERE t2.id_rol = 1");
+                                                WHERE t2.id_rol = 1
+                                                AND t1.deleted_at IS NULL");
 
                     foreach ($personas as &$persona) {
                                     
@@ -123,7 +126,8 @@
                                                     FROM persona t1
                                                     INNER JOIN usuario t2
                                                     ON t1.id = t2.id_persona
-                                                    WHERE t2.id_rol = 2");
+                                                    WHERE t2.id_rol = 2
+                                                    AND t1.deleted_at IS NULL");
 
                     foreach ($items as &$item) {
 

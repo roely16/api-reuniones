@@ -4,11 +4,15 @@
 
     use Illuminate\Database\Eloquent\Model;
 
+    use Illuminate\Database\Eloquent\SoftDeletes;
+
     class Reunion extends Model{
         
         protected $table = "reunion";
         protected $primaryKey = "id";
 
+        use SoftDeletes;
+        
         public function encargado_registro(){
 
             return $this->belongsTo('App\Persona', 'registrado_por');

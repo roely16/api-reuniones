@@ -65,7 +65,7 @@
                 // Si el rol es admin puede acceder a las reuniones de admin y asesores
 
                 $reuniones = app('db')->select("SELECT 
-                                                    t1.*, 
+                                                    t1.id, 
                                                     t2.nombres, 
                                                     t2.apellidos, 
                                                     t2.avatar, 
@@ -95,7 +95,7 @@
                 $id_grupo = $grupo[0]->id_grupo;
 
                 $reuniones = app('db')->select("SELECT 
-                                                    t1.*, 
+                                                    t1.id, 
                                                     t2.nombres, 
                                                     t2.apellidos, 
                                                     t2.avatar, 
@@ -115,7 +115,7 @@
 
                 // Solo tiene acceso a sus bitácoras
                 $reuniones = app('db')->select("SELECT 
-                                                    t1.*, 
+                                                    t1.id, 
                                                     t2.nombres, 
                                                     t2.apellidos, 
                                                     t2.avatar, 
