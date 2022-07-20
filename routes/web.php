@@ -65,3 +65,6 @@ $router->post('/verificar_participacion', 'CalendarioController@verificar_partic
 
 // Personas para agregar en el calendario, dependiendo del rol
 $router->post('/personas_calendario', 'CalendarioController@personas_calendario');
+
+// Vista Previa
+$router->post('/procesar_vistaprevia', 'VistaPreviaController@procesar');
