@@ -68,3 +68,9 @@ $router->post('/personas_calendario', 'CalendarioController@personas_calendario'
 
 // Vista Previa
 $router->post('/procesar_vistaprevia', 'VistaPreviaController@procesar');
+
+// Obtener los datos para el formulario de reunión
+$router->post('/datos_formulario', 'ReunionController@datos_formulario');
+
+// Información del módulo de participantes
+$router->post('/modulo_participantes', 'ReunionController@modulo_participantes');

@@ -7,6 +7,11 @@
     use App\Reunion;
     use App\Usuario;
     use App\Rol;
+    use App\MetodoReunion;
+    use App\Area;
+    use App\Empleado;
+
+    use Illuminate\Support\Facades\DB;
 
     class ReunionController extends Controller{
 
@@ -241,6 +246,67 @@
             ];
 
             return response()->json($data);
+
+        }
+
+        public function datos_formulario(){
+
+            try {
+                
+                // Obtener los metodos de reunión
+                $metodos = MetodoReunion::all();
+
+                $response = [
+                    'metodos' => $metodos
+                ];
+
+                return response()->json($response, 200);
+
+            } catch (\Throwable $th) {
+                
+                return response()->json($th->getMessage(), 400);
+
+            }
+
+        }
+
+        public function modulo_participantes(Request $request){
+
+            try {
+                
+                $areas = Area::where('estatus', 'A')->get();
+
+                // Obtener los empleados por cada area
+                foreach ($areas as &$area) {
+                    
+                    $empleados = Empleado::select(
+                                        DB::raw("CONCAT(NOMBRE, CONCAT(' ', APELLIDO)) as nombre, nit, codarea"),
+                                    )
+                                    ->where('status', 'A')
+                                    ->where('codarea', $area->codarea)
+                                    ->get();
+
+                    foreach ($empleados as &$empleado) {
+                        $empleado->selected = false;
+                    }
+
+                    $area->empleados = $empleados;
+                    $area->participantes = [];
+                    $area->expand = false;
+
+                }
+
+                $response = [
+                    'areas' => $areas
+                ];
+
+                return response()->json($response, 200);
+
+            } catch (\Throwable $th) {
+
+                return response()->json($th->getMessage(), 400);
+
+            }
 
         }
         

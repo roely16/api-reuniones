@@ -136,9 +136,13 @@
 
             }
 
+            // Obtener el nombre del usuario
+            $persona = Persona::find($usuario->id_persona);
+
             $data_usuario = [
                 "id" => $usuario->id,
-                "id_persona" => $usuario->id_persona
+                "id_persona" => $usuario->id_persona,
+                'nombre' => $persona->nombres . ' ' . $persona->apellidos
             ];
 
             // Contraseña ingresada correcta

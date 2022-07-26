@@ -34,7 +34,11 @@
             Minuta de reunión número: 
         </td>
         <td width="35%"></td>
-        <td rowspan="2"></td>
+        <td class="row" rowspan="2">
+            Fecha:
+            <br>
+            {{ $encabezado->fecha }}
+        </td>
     </tr>
     <tr>
         <td class="row">
@@ -46,14 +50,27 @@
         <td class="row">
             Método (presencial, virtual, etc):
         </td>
-        <td></td>
-        <td rowspan="2"></td>
+        <td class="row">
+            {{ $encabezado->nombre_metodo }}
+        </td>
+        <td class="row" rowspan="2">
+            Hora Inicio:
+            <br>
+            {{ $encabezado->hora_inicio }}
+            <br>
+            <br>
+            Hora Finalización
+            <br>
+            {{ $encabezado->hora_fin }}
+        </td>
     </tr>
     <tr>
         <td class="row">
             Responsable de organizar la agenda y transcribir acuerdos/tareas de la semana:
         </td>
-        <td></td>
+        <td class="row">
+            {{ $encabezado->responsable }}
+        </td>
     </tr>
 </table>
 
@@ -63,12 +80,16 @@
             <span>PARTICIPANTES</span>
         </td>
     </tr>
-    <tr width="100%">
-        <td width="8%" class="row column-number">1</td>
-        <td colspan="2" class="row">
-            Herson Roely Chur Chinchilla
-        </td>
-    </tr>
+    @foreach($participantes as $key => $participante)
+        <tr width="100%">
+            <td width="8%" class="row column-number">
+                {{ $key + 1 }}
+            </td>
+            <td colspan="2" class="row">
+                {{ $participante['nombre'] }}
+            </td>
+        </tr>
+    @endforeach
 </table>
 
 <table style="margin-top: 25px;">
@@ -78,6 +99,7 @@
         </td>
     </tr>
     @foreach ($puntos_agenda as $key => $punto)
+        @if($punto['text'] != null)
         <tr>
             <td width="8%" class="row column-number">
                 {{ $key + 1}}
@@ -86,6 +108,7 @@
                 {{ $punto['text'] }}
             </td>
         </tr>
+        @endif
     @endforeach
 </table>
 
@@ -99,6 +122,7 @@
         </td>
     </tr>
     @foreach ($pendientes as $key => $pendiente)
+        @if($pendiente['actividad'] != null)
         <tr>
             <td width="8%" class="row column-number">{{ $key + 1 }}</td>
             <td width="55%" class="row">
@@ -108,5 +132,6 @@
                 {{ $pendiente['responsable'] }}
             </td>
         </tr>
+        @endif
     @endforeach
 </table>
