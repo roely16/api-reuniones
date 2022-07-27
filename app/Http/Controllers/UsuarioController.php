@@ -7,6 +7,9 @@
     use App\Menu;
     use App\Rol;
 
+    use App\Empleado;
+    use App\Area;
+
     use Illuminate\Http\Request;
     use Illuminate\Support\Facades\Crypt;
 
@@ -139,10 +142,17 @@
             // Obtener el nombre del usuario
             $persona = Persona::find($usuario->id_persona);
 
+            // Obtener el área al que pertenece
+            $usuario_rrhh = Empleado::find($persona->nit);
+            $area = Area::find($usuario_rrhh->codarea);
+
             $data_usuario = [
                 "id" => $usuario->id,
                 "id_persona" => $usuario->id_persona,
-                'nombre' => $persona->nombres . ' ' . $persona->apellidos
+                'nombre' => $persona->nombres . ' ' . $persona->apellidos,
+                'nit' => $persona->nit,
+                'area' => $area->descripcion,
+                'codarea' => $area->codarea
             ];
 
             // Contraseña ingresada correcta

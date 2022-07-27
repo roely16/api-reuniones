@@ -37,6 +37,7 @@
             $persona->telefono = $request->telefono;
             $persona->email = $request->email;
             $persona->cargo = $request->cargo;
+            $persona->nit = $request->nit;
 
             $persona->grupo = $request->grupo ? 'S' :  null;
             
@@ -305,6 +306,7 @@
             $persona->telefono = $request->telefono;
             $persona->email = $request->email;
             $persona->cargo = $request->cargo;
+            $persona->nit = $request->nit;
             
             $result = $persona->save();
 

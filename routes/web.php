@@ -74,3 +74,6 @@ $router->post('/datos_formulario', 'ReunionController@datos_formulario');
 
 // Información del módulo de participantes
 $router->post('/modulo_participantes', 'ReunionController@modulo_participantes');
+
+// Obtener las áreas junto con los colaboradores
+$router->post('/obtener_areas', 'AreaController@obtener_areas');

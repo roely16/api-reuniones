@@ -44,7 +44,9 @@
         <td class="row">
             Coordinación, Sección o Unidad:
         </td>
-        <td></td>
+        <td class="row">
+            {{ $encabezado->seccion }}
+        </td>
     </tr>
     <tr>
         <td class="row">

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Area extends Model{
     
     protected $table = "rh_areas";
-    protected $primaryKey = "id";
+    protected $primaryKey = "codarea";
 
     protected $connection = 'rrhh';
 

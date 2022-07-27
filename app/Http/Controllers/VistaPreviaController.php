@@ -9,6 +9,8 @@ use Barryvdh\DomPDF\Facade as PDF;
 use App\MetodoReunion;
 use App\Usuario;
 use App\Persona;
+use App\Empleado;
+use App\Area;
 
 class VistaPreviaController extends Controller{
 
@@ -20,11 +22,21 @@ class VistaPreviaController extends Controller{
 
         // Buscar el método de la reunión
         $metodo = MetodoReunion::find($encabezado->metodo);
-        $encabezado->nombre_metodo = $metodo->nombre;
+        $encabezado->nombre_metodo = $metodo ? $metodo->nombre : null;
 
         // Buscar el responsable de redactar la minuta
         $usuario = Usuario::find($encabezado->id_responsable);
         $persona = Persona::find($usuario->id_persona);
+
+        if ($persona->nit) {
+            
+            $usuario_rrhh = Empleado::find($persona->nit);
+            $area = Area::find($usuario_rrhh->codarea);
+
+            $encabezado->seccion = $area->descripcion;
+            $encabezado->codarea = $area->codarea;
+
+        }
 
         $data = [
             'encabezado' => $encabezado,
