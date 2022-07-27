@@ -33,7 +33,9 @@
         <td width="35%" class="row">
             Minuta de reunión número: 
         </td>
-        <td width="35%"></td>
+        <td width="35%" class="row">
+            {{ $encabezado->id }}
+        </td>
         <td class="row" rowspan="2">
             Fecha:
             <br>

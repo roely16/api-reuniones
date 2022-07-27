@@ -10,6 +10,7 @@
     use App\MetodoReunion;
     use App\Area;
     use App\Empleado;
+    use App\ParticipanteReunion;
 
     use Illuminate\Support\Facades\DB;
 
@@ -17,45 +18,69 @@
 
         public function registrar_reunion(Request $request){
 
-            $reunion = new Reunion();
-
-            $reunion->contenido = $request->content;
-            $reunion->observaciones = $request->observaciones;
-            $reunion->registrado_por = $request->registrado_por;
-            $result = $reunion->save();
-
-            // Registrar las personas para compartir
-            foreach ($request->compartir as $id) {
+            try {
                 
-                $result = app('db')->table('reunion_compartir')->insert([
-                    'id_reunion' => $reunion->id,
-                    'id_persona' => $id
-                ]);
+                $encabezado = (object) $request->encabezado;
+                $pendientes = (object) $request->pendientes;
+                $puntos_agenda = (object) $request->puntos_agenda;
+                $participantes = (object) $request->participantes;
 
-            }
+                // Si el encabezado trae ID es una actualización
+                $reunion = !$encabezado->id ? new Reunion() : Reunion::find($encabezado->id);
 
-            if (!$result) {
-                
+                // Registra la información del encabezado
+                $reunion->observaciones = $encabezado->comentarios;
+                $reunion->registrado_por = $encabezado->id_responsable;
+                $reunion->fecha = $encabezado->fecha;
+                $reunion->codarea = $encabezado->codarea;
+                $reunion->id_metodo = $encabezado->metodo;
+                $reunion->hora_inicio = $encabezado->hora_inicio;
+                $reunion->hora_fin = $encabezado->hora_fin;
+
+                $reunion->save();
+
+                // Eliminar el registro previo de participantes
+                if ($encabezado->id) {
+                    
+
+
+                }
+
+                // Registro de participantes
+                foreach ($participantes as &$participante) {
+                    
+                    $participante = (object) $participante;
+
+                    $participante_reunion = new ParticipanteReunion();
+                    $participante_reunion->id_reunion = $reunion->id;
+                    $participante_reunion->participante = $participante->nit;
+                    $participante_reunion->save();
+
+                }
+
+                $response = [
+                    'encabezado' => $reunion,
+                    'puntos_agenda' => [],
+                    'pendientes' => []
+                ];
+
+                return response()->json($response);
+
                 $data = [
-                    "status" => 100,
-                    "title" => "Error",
-                    "message" => "Se ha presentado un problema al procesar su solicitud",
-                    "type" => "error"
+                    "status" => 200,
+                    "title" => "Excelente!",
+                    "message" => "Los datos de la reunión han sido registrados exitosamente",
+                    "type" => "success",
+                    "data" => $reunion
                 ];
 
                 return response()->json($data);
 
+            } catch (\Throwable $th) {
+                
+                return response()->json($th->getMessage(), 400);
+
             }
-
-            $data = [
-                "status" => 200,
-                "title" => "Excelente!",
-                "message" => "Los datos de la reunión han sido registrados exitosamente",
-                "type" => "success",
-                "data" => $reunion
-            ];
-
-            return response()->json($data);
 
         }
 

@@ -77,3 +77,6 @@ $router->post('/modulo_participantes', 'ReunionController@modulo_participantes')
 
 // Obtener las áreas junto con los colaboradores
 $router->post('/obtener_areas', 'AreaController@obtener_areas');
+
+// Obtener el detalle de un colaborador
+$router->post('/detalle_colaborador', 'AreaController@detalle_colaborador');
