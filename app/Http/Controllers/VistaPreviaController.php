@@ -25,8 +25,7 @@ class VistaPreviaController extends Controller{
         $encabezado->nombre_metodo = $metodo ? $metodo->nombre : null;
 
         // Buscar el responsable de redactar la minuta
-        $usuario = Usuario::find($encabezado->id_responsable);
-        $persona = Persona::find($usuario->id_persona);
+        $persona = Persona::find($encabezado->id_responsable);
 
         if ($persona->nit) {
             

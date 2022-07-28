@@ -133,7 +133,7 @@
                 {{ $pendiente['actividad']}}
             </td>
             <td width="37%" class="row">
-                {{ $pendiente['responsable'] }}
+                {{ $pendiente['nombre_completo'] }}
             </td>
         </tr>
         @endif

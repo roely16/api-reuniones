@@ -11,6 +11,9 @@
     use App\Area;
     use App\Empleado;
     use App\ParticipanteReunion;
+    use App\Agenda;
+    use App\Pendiente;
+    use App\Persona;
 
     use Illuminate\Support\Facades\DB;
 
@@ -28,6 +31,8 @@
                 // Si el encabezado trae ID es una actualización
                 $reunion = !$encabezado->id ? new Reunion() : Reunion::find($encabezado->id);
 
+                // Buscar a la persona
+
                 // Registra la información del encabezado
                 $reunion->observaciones = $encabezado->comentarios;
                 $reunion->registrado_por = $encabezado->id_responsable;
@@ -39,10 +44,41 @@
 
                 $reunion->save();
 
-                // Eliminar el registro previo de participantes
-                if ($encabezado->id) {
-                    
+                // Eliminar los puntos de agenda para actualizar
+                Agenda::where('id_reunion', $reunion->id)->delete();
 
+                foreach ($puntos_agenda as &$punto) {
+                    
+                    $punto = (object) $punto;
+
+                    if ($punto->text) {
+                        
+                        $agenda = new Agenda();
+                        $agenda->id_reunion = $reunion->id;
+                        $agenda->contenido = $punto->text;
+                        $agenda->save();
+
+                    }
+
+                }
+
+                // Eliminar el listado de pendientes
+                Pendiente::where('id_reunion', $reunion->id)->delete();
+
+                // Registrar el listado de pendientes
+                foreach ($pendientes as &$pendiente) {
+                    
+                    $pendiente = (object) $pendiente;
+
+                    if ($pendiente->actividad) {
+                        
+                        $tarea = new Pendiente();
+                        $tarea->id_reunion = $reunion->id;
+                        $tarea->contenido = $pendiente->actividad;
+                        $tarea->responsable = $pendiente->responsable;
+                        $tarea->save();
+
+                    }
 
                 }
 
@@ -196,24 +232,56 @@
 
         public function obtener_detalle(Request $request){
 
-            $reunion = Reunion::find($request->id);
-
-            // Obtener las personas registradas como compartir
-            $compartir = app('db')->select("    SELECT id_persona
-                                                FROM reunion_compartir
-                                                WHERE id_reunion = $reunion->id");
-
-            $ids_compartir = [];
-
-            foreach ($compartir as $id) {
+            try {
                 
-                $ids_compartir [] = $id->id_persona;
+                $reunion = Reunion::find($request->id);
+
+                // Buscar a la persona
+                $persona = Persona::find($reunion->registrado_por);
+                $persona_rrhh = Empleado::find($persona->nit);
+                $area = Area::find($persona_rrhh->codarea);
+
+                // Creación del encabezado
+
+                $reunion->comentarios = $reunion->observaciones;
+                $reunion->id_responsable = $reunion->registrado_por;
+                $reunion->metodo = $reunion->id_metodo;
+
+                $reunion->responsable = $persona->nombres . ' ' . $persona->apellidos;
+                $reunion->seccion = $area->descripcion;
+                $reunion->nit = $persona_rrhh->nit;
+
+                // Agenda 
+                $puntos_agenda = Agenda::select('id', 'id_reunion', 'contenido as text')->where('id_reunion', $reunion->id)->get();
+
+                // Pendientes
+                $pendientes = Pendiente::where('id_reunion', $reunion->id)->get();
+
+                // Buscar el nombre de cada responsable
+                foreach ($pendientes as &$pendiente) {
+                    
+                    $empleado = Empleado::find($pendiente->responsable);
+
+                    $pendiente->nombre_completo = $empleado->nombre . ' ' . $empleado->apellido;
+                    $pendiente->actividad = $pendiente->contenido;
+
+                }
+
+                // Obtener los participantes
+
+                $response = [
+                    'encabezado' => $reunion,
+                    'puntos_agenda' => $puntos_agenda,
+                    'pendientes' => $pendientes
+                ];
+
+                return response()->json($response);
+
+            } catch (\Throwable $th) {
+                
+                return response()->json($th->getMessage(), 400);
 
             }
-
-            $reunion->compartir = $ids_compartir;
-
-            return response()->json($reunion);
 
         }
 
@@ -313,11 +381,14 @@
 
                     foreach ($empleados as &$empleado) {
                         $empleado->selected = false;
+                        $empleado->participante_selected = false;
                     }
 
                     $area->empleados = $empleados;
                     $area->participantes = [];
                     $area->expand = false;
+                    $area->value = false;
+                    $area->value_participante = false;
 
                 }
 
