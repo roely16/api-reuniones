@@ -163,6 +163,37 @@
 
         }
 
+        public function share_data(Request $request){
+
+            try {
+                
+                // Obtener el listado de usuario a los cuales se les puede compartir
+                $personas = Persona::all();
+                
+                foreach ($personas as &$persona) {
+                    
+                    $persona->nombre_completo = $persona->nombres . ' ' . $persona->apellidos;
+
+                }
+
+                // Obtener el listado de historial
+                $historial = ReunionEnvio::where('id_reunion', $request->id)->get();
+
+                $response = [
+                    'destinos' => $personas,
+                    'historial' => $historial
+                ];
+
+                return response()->json($response);
+
+            } catch (\Throwable $th) {
+                
+                return response()->json($th->getMessage(), 400);
+
+            }
+
+        }
+
     }
 
 ?>

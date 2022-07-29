@@ -80,3 +80,6 @@ $router->post('/obtener_areas', 'AreaController@obtener_areas');
 
 // Obtener el detalle de un colaborador
 $router->post('/detalle_colaborador', 'AreaController@detalle_colaborador');
+
+// Obtener la información para el sección de Compartir
+$router->post('/share_data', 'CompartirController@share_data');
