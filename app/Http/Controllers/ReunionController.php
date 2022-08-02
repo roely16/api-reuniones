@@ -82,6 +82,9 @@
 
                 }
 
+                // Eliminar los participantes y registrar de nuevo
+                ParticipanteReunion::where('id_reunion', $reunion->id)->delete();
+
                 // Registro de participantes
                 foreach ($participantes as &$participante) {
                     
@@ -234,7 +237,11 @@
 
             try {
                 
-                $reunion = Reunion::find($request->id);
+                $reunion = app('db')->select("  SELECT *
+                                                FROM reunion
+                                                WHERE id = '$request->id'");
+
+                $reunion = $reunion[0];
 
                 // Buscar a la persona
                 $persona = Persona::find($reunion->registrado_por);
@@ -246,6 +253,7 @@
                 $reunion->comentarios = $reunion->observaciones;
                 $reunion->id_responsable = $reunion->registrado_por;
                 $reunion->metodo = $reunion->id_metodo;
+                //$reunion->updated_at = $reunion->updated_at->format('Y-m-d H:m:i');
 
                 $reunion->responsable = $persona->nombres . ' ' . $persona->apellidos;
                 $reunion->seccion = $area->descripcion;
@@ -267,12 +275,68 @@
 
                 }
 
+                // Participantes
+
+                // Obtener las areas
+                $areas = Area::where('estatus', 'A')->get();
+
+                // Obtener los colaboradores por cada area y colocares en empleados o en participantes
+                foreach ($areas as &$area) {
+                    
+                    // Obtener lista de participantes
+                    $participantes_reunion = ParticipanteReunion::select('participante')
+                                                ->where('id_reunion', $reunion->id)
+                                                ->get()
+                                                ->pluck('participante');
+
+                    // La lista de empleado no debe de contener los que sean participantes
+                    $empleados = Empleado::select(
+                                    DB::raw("CONCAT(NOMBRE, CONCAT(' ', APELLIDO)) as nombre, nit, codarea"),
+                                )
+                                ->where('status', 'A')
+                                ->where('codarea', $area->codarea)
+                                ->whereNotIn('nit', $participantes_reunion)
+                                ->get();
+                    
+                    foreach ($empleados as &$empleado) {
+
+                        $empleado->selected = false;
+                        $empleado->participante_selected = false;
+
+                    }
+
+                    $participantes = Empleado::select(
+                                            DB::raw("CONCAT(NOMBRE, CONCAT(' ', APELLIDO)) as nombre, nit, codarea"),
+                                        )
+                                        ->where('status', 'A')
+                                        ->where('codarea', $area->codarea)
+                                        ->whereIn('nit', $participantes_reunion)
+                                        ->get();
+
+                    foreach ($participantes as &$participante) {
+
+                        $participante->selected = false;
+                        $participante->participante_selected = false;
+
+                    }
+
+                    $area->empleados = $empleados;
+                    $area->participantes = $participantes;
+                    $area->participantes_reunion = $participantes_reunion;
+
+                    $area->expand = false;
+                    $area->value = false;
+                    $area->value_participante = false;
+                            
+                }
+
                 // Obtener los participantes
 
                 $response = [
                     'encabezado' => $reunion,
                     'puntos_agenda' => $puntos_agenda,
-                    'pendientes' => $pendientes
+                    'pendientes' => $pendientes,
+                    'areas' => $areas
                 ];
 
                 return response()->json($response);

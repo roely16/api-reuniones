@@ -19,6 +19,10 @@
 
         }
 
+        // protected $casts = [
+        //     'updated_at' => "datetime:Y-m-d H:m:i",
+        // ];
+
     }
 
 ?>
