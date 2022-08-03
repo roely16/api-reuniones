@@ -12,6 +12,12 @@ use App\Persona;
 use App\Empleado;
 use App\Area;
 
+use App\ReunionEnvio;
+use App\ReunionEnvioDetalle;
+
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ShareMail;
+
 class VistaPreviaController extends Controller{
 
     public function procesar(Request $request){
@@ -47,6 +53,55 @@ class VistaPreviaController extends Controller{
         $pdf = PDF::loadView('formato_reunion', $data);
 
         $pdf->save('pdf/temp.pdf');
+
+        // Si se debe compartir
+        if ($request->share) {
+            
+            // Guardar el archivo que se enviara 
+            $uniqid = uniqid();
+
+            $pdf->save('pdf/' . $uniqid . '.pdf');
+            $filename = $uniqid . '.pdf';
+
+            $data = [
+                'filename' => $filename
+            ];
+
+            $destinos = $request->destinos;
+
+            // Enviar a todos los destinos
+            foreach ($destinos as &$destino) {
+                
+                $destino = (object) $destino;
+
+                Mail::to(trim($destino->email))->send(new ShareMail($data));
+
+            }
+
+            // Registra el envio
+            $envio = new ReunionEnvio();
+            $envio->id_reunion = $encabezado->id;
+            $envio->documento = $filename;
+            $envio->enviado_por = $encabezado->id_responsable;
+            $envio->save();
+
+            // Registrar los destinatarios 
+            foreach ($destinos as $destino) {
+                
+                $destino = (object) $destino;
+
+                $envio_detalle = new ReunionEnvioDetalle();
+                $envio_detalle->id_envio = $envio->id;
+                $envio_detalle->id_persona = $destino->id;
+                $envio_detalle->email = $destino->email;
+                $envio_detalle->save();
+
+            }
+
+
+            return response()->json('share');
+
+        }
 
         $data = [
             "pdf_url" => "pdf/temp.pdf#toolbar=0"

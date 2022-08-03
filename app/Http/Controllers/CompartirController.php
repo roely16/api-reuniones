@@ -10,6 +10,8 @@
     use App\ReunionEnvio;
     use App\ReunionEnvioDetalle;
     use App\Persona;
+    use App\Grupo;
+    use App\GrupoParticipante;
 
     require base_path() . '/vendor/PHPMailer_old/PHPMailerAutoload.php';
 
@@ -167,6 +169,18 @@
 
             try {
                 
+                // Buscar si la persona tiene algun grupo
+                $grupo = Grupo::where('id_persona', $request->id_persona)->first();
+
+                // if ($grupo) {
+                    
+                //     $integrantes = DB::select('SELECT *
+                //                                 FROM grupo_participante t1
+                //                                 INNER JOIN perseona t2
+                //                                 ON t1.id_persona = ');
+
+                // }
+
                 // Obtener el listado de usuario a los cuales se les puede compartir
                 $personas = Persona::all();
                 
@@ -177,7 +191,29 @@
                 }
 
                 // Obtener el listado de historial
-                $historial = ReunionEnvio::where('id_reunion', $request->id)->get();
+                $historial = app('db')->select("SELECT
+                                                    id,
+                                                    id_reunion,
+                                                    documento,
+                                                    enviado_por,
+                                                    DATE_FORMAT(created_at, '%d/%m/%Y %H:%i:%s') as created_at
+                                                FROM reunion_envio
+                                                WHERE id_reunion = $request->id");
+
+                // Obtener del detalle del historial
+                foreach ($historial as &$record) {
+                    
+                    $detalle = app('db')->select("  SELECT *
+                                                    FROM reunion_envio_detalle t1
+                                                    INNER JOIN persona t2
+                                                    ON t1.id_persona = t2.id
+                                                    WHERE t1.id_envio = $record->id
+                                                ");
+
+                    $record->detalle = $detalle;
+                    $record->expand = false;
+
+                }
 
                 $response = [
                     'destinos' => $personas,
