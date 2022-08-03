@@ -86,7 +86,7 @@ class VistaPreviaController extends Controller{
             $envio->save();
 
             // Registrar los destinatarios 
-            foreach ($destinos as $destino) {
+            foreach ($destinos as &$destino) {
                 
                 $destino = (object) $destino;
 
