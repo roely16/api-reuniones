@@ -17,6 +17,7 @@ use App\ReunionEnvioDetalle;
 
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ShareMail;
+use App\Reunion;
 
 class VistaPreviaController extends Controller{
 
@@ -25,6 +26,20 @@ class VistaPreviaController extends Controller{
         PDF::setOptions(['defaultFont' => 'arial', 'isRemoteEnabled' => true, 'debugKeepTemp' => true, 'tempDir' => '/public/pdf/']);
 
         $encabezado = (object) $request->encabezado;
+
+        // // Determinar si la minuta es de un forma anterior en base al contenido
+        // if ($encabezado->id) {
+            
+        //     // Buscar la minuta
+        //     $reunion = Reunion::find($encabezado->id);
+            
+        //     if ($reunion->contenido) {
+                
+        //         return response()->json($reunion->contenido);
+
+        //     }
+
+        // }
 
         // Buscar el método de la reunión
         $metodo = MetodoReunion::find($encabezado->metodo);
