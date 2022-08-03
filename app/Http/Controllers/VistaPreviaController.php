@@ -63,16 +63,18 @@ class VistaPreviaController extends Controller{
             $pdf->save('pdf/' . $uniqid . '.pdf');
             $filename = $uniqid . '.pdf';
 
-            $data = [
-                'filename' => $filename
-            ];
-
             $destinos = $request->destinos;
 
             // Enviar a todos los destinos
             foreach ($destinos as &$destino) {
                 
                 $destino = (object) $destino;
+
+                $data = [
+                    'filename' => $filename,
+                    'encabezado' => $encabezado,
+                    'destino' => $destino
+                ];
 
                 Mail::to(trim($destino->email))->send(new ShareMail($data));
 
