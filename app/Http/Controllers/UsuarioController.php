@@ -144,7 +144,19 @@
 
             // Obtener el área al que pertenece
             $usuario_rrhh = Empleado::find($persona->nit);
-            $area = Area::find($usuario_rrhh->codarea);
+
+            if ($usuario_rrhh) {
+                
+                $area = Area::find($usuario_rrhh->codarea);
+
+            }else{
+
+                $area = (object) [
+                    'descripcion' => null,
+                    'codarea' => null
+                ];
+
+            }
 
             $data_usuario = [
                 "id" => $usuario->id,

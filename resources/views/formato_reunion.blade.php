@@ -90,7 +90,7 @@
                 {{ $key + 1 }}
             </td>
             <td colspan="2" class="row">
-                {{ $participante['nombre'] }}
+                {{ $participante['nombre'] }} -  {{ $participante['area'] }}
             </td>
         </tr>
     @endforeach

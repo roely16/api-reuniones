@@ -27,20 +27,6 @@ class VistaPreviaController extends Controller{
 
         $encabezado = (object) $request->encabezado;
 
-        // // Determinar si la minuta es de un forma anterior en base al contenido
-        // if ($encabezado->id) {
-            
-        //     // Buscar la minuta
-        //     $reunion = Reunion::find($encabezado->id);
-            
-        //     if ($reunion->contenido) {
-                
-        //         return response()->json($reunion->contenido);
-
-        //     }
-
-        // }
-
         // Buscar el método de la reunión
         $metodo = MetodoReunion::find($encabezado->metodo);
         $encabezado->nombre_metodo = $metodo ? $metodo->nombre : null;
@@ -58,11 +44,22 @@ class VistaPreviaController extends Controller{
 
         }
 
+        // Participantes obtener el área o coordinación 
+        $participantes = $request->participantes;
+
+        foreach ($participantes as &$participante) {
+            
+            $area = Area::find($participante['codarea']);
+
+            $participante['area'] = $area->descripcion;
+
+        }
+
         $data = [
             'encabezado' => $encabezado,
             'puntos_agenda' => $request->puntos_agenda,
             'pendientes' => $request->pendientes,
-            'participantes' => $request->participantes
+            'participantes' => $participantes
         ];
 
         $pdf = PDF::loadView('formato_reunion', $data);

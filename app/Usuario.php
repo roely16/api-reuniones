@@ -11,6 +11,8 @@
 
         protected $fillable = ['usuario', 'password', 'id_persona', 'id_rol'];
 
+        protected $connection = 'mysql';
+
     }
 
 ?>
