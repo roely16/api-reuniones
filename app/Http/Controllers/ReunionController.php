@@ -321,7 +321,9 @@
                     }
 
                     $area->empleados = $empleados;
+                    $area->empleados_bk = $empleados;
                     $area->participantes = $participantes;
+                    $area->participantes_bk = $participantes;
                     $area->participantes_reunion = $participantes_reunion;
 
                     $area->expand = false;
@@ -449,6 +451,7 @@
                     }
 
                     $area->empleados = $empleados;
+                    $area->empleados_bk = $empleados;
                     $area->participantes = [];
                     $area->expand = false;
                     $area->value = false;
