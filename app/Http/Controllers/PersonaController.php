@@ -10,6 +10,8 @@
     use App\Usuario;
     use App\Rol;
 
+    use App\Empleado;
+
     class PersonaController extends BaseController{
         
         public function personas_compartir(Request $request){
@@ -214,6 +216,42 @@
             }
 
             return response()->json($personas);
+
+        }
+
+        public function set_nit(){
+
+            try {
+                
+                // Obtener a las personas que no tienen nit
+                $personas = Persona::where('nit', null)->get();
+
+                foreach ($personas as &$persona) {
+                    
+                    // Buscar a la persona por el correo
+                    $empleado = Empleado::where('emailmuni', $persona->email)->orWhere('email', $persona->email)->first();
+
+                    if ($empleado) {
+                        
+                        $persona->nit = $empleado->nit;
+
+                        // Actualizar el registro de la persona con el nuevo nit
+                        $persona_update = Persona::find($persona->id);
+
+                        $persona_update->nit = $empleado->nit;
+                        $persona_update->save();
+
+                    }
+
+                }
+
+                return response()->json($personas);
+
+            } catch (\Throwable $th) {
+                
+                return response()->json($th->getMessage(), 400);
+
+            }
 
         }
 

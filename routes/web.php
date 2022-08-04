@@ -83,3 +83,6 @@ $router->post('/detalle_colaborador', 'AreaController@detalle_colaborador');
 
 // Obtener la información para el sección de Compartir
 $router->post('/share_data', 'CompartirController@share_data');
+
+// Set nit
+$router->get('/set_nit', 'PersonaController@set_nit');
