@@ -133,7 +133,7 @@
                 {{ $pendiente['actividad']}}
             </td>
             <td width="37%" class="row">
-                {{ $pendiente['nombre_completo'] }}
+                {{ array_key_exists('nombre_completo', $pendiente) ? $pendiente['nombre_completo'] : null }}
             </td>
         </tr>
         @endif

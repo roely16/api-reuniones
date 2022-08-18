@@ -270,7 +270,16 @@
                     
                     $empleado = Empleado::find($pendiente->responsable);
 
-                    $pendiente->nombre_completo = $empleado->nombre . ' ' . $empleado->apellido;
+                    if ($empleado) {
+
+                        $pendiente->nombre_completo = $empleado->nombre . ' ' . $empleado->apellido;
+                       
+                    }else{
+
+                        $pendiente->nombre_completo = null;
+
+                    }
+                    
                     $pendiente->actividad = $pendiente->contenido;
 
                 }
